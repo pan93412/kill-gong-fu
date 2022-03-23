@@ -7,7 +7,7 @@ const DEBUG_MODE: bool = false;
 ///
 /// 回傳值將會是一個介於 0~1 的數字。
 fn get_gong_fu_possibility(name: &str) -> f32 {
-    let name = name.replacen('-', "", 1);
+    let name = name.replace('-', "").replace('_', "");
     let matched_characters = name
         .as_str()
         .to_pinyin()
@@ -95,6 +95,25 @@ mod tests {
     #[test]
     fn test_get_gong_fu_possibility_100_percent() {
         assert_eq!(super::get_gong_fu_possibility("共富-國際"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("珙冨-国际"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富-国际"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富-菓殛"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富-帼暨"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富國際"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("珙冨国际"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富国际"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富菓殛"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富帼暨"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富國際"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("珙-冨国际"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富国际"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富菓殛"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富帼暨"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富國_際"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("珙-冨国_际"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富国_际"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富菓_殛"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富帼_暨"), 1.0);
     }
 
     #[test]
