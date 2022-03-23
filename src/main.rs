@@ -1,7 +1,7 @@
 use pinyin::ToPinyin;
-// use once_cell::sync::Lazy;
 use teloxide::prelude2::*;
-// use pinyin::{ToPinyin, ToPinyinMulti};
+
+const DEBUG_MODE: bool = false;
 
 /// 判斷是「共富國際」的可能率。
 ///
@@ -23,7 +23,8 @@ fn get_gong_fu_possibility(name: &str) -> f32 {
         let n = name.chars().count() as f32;
 
         if n > 0.0 {
-            1.0 - (1.0 - (x / n)).abs()
+            // .max(4.0) 是因為 spam 的名字去掉 hyphen 至少要有 4 個字元。
+            1.0 - (1.0 - (x / n.max(4.0))).abs()
         } else {
             0.0
         }
@@ -38,26 +39,36 @@ async fn main() {
     let bot = Bot::from_env().auto_send();
 
     teloxide::repls2::repl(bot, |message: Message, bot: AutoSend<Bot>| async move {
-        let possibility = message.text().map(get_gong_fu_possibility).unwrap_or(0.0);
+        if let Some(from) = message.from() {
+            let chat_title = if DEBUG_MODE {
+                message.text().unwrap_or("<?>").to_string()
+            } else {
+                from.full_name()
+            };
 
-        if possibility == 1.0 {
-            log::info!("spam possibility = 1.0, kick out!");
+            let possibility = get_gong_fu_possibility(&chat_title);
+            log::debug!("possiblity of {}: {}", from.id, possibility);
 
-            if let Some(sender_chat) = message.sender_chat() {
-                bot.kick_chat_member(message.chat.id, sender_chat.id)
-                    .await?;
+            if possibility == 1.0 {
+                log::info!("spam possibility = 1.0, kick out {}!", from.id);
+
                 bot.send_message(
                     message.chat.id,
-                    format!(
-                        "{} 極有可能是廣告 - 已自動踢出，可自動拉回。",
-                        sender_chat.title().unwrap_or("<?>")
-                    ),
+                    format!("{chat_title} 極有可能是廣告 - 決定踢出，可自動拉回。"),
+                )
+                .await?;
+                bot.kick_chat_member(message.chat.id, from.id)
+                    .await?;
+            } else if possibility >= 0.8 {
+                log::info!("spam possibility >= 0.8, send message to notify administrators.");
+                bot.send_message(
+                    message.chat.id,
+                    format!("{chat_title} 可能是廣告，請管理員留意。"),
                 )
                 .await?;
             }
         }
-        bot.send_message(message.chat.id, possibility.to_string())
-            .await?;
+
         respond(())
     })
     .await;
