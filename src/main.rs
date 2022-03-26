@@ -13,7 +13,7 @@ fn get_gong_fu_possibility(name: &str) -> f32 {
         .to_pinyin()
         .flatten()
         .map(|v| v.plain())
-        .filter(|v| matches!(*v, "gong" | "fu" | "guo" | "ji"))
+        .filter(|v| matches!(*v, "gong" | "fu" | "guo" | "ji" | "yu" | "le"))
         .count();
 
     {
@@ -114,6 +114,26 @@ mod tests {
         assert_eq!(super::get_gong_fu_possibility("共-富国_际"), 1.0);
         assert_eq!(super::get_gong_fu_possibility("共-富菓_殛"), 1.0);
         assert_eq!(super::get_gong_fu_possibility("共-富帼_暨"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富-國際娛樂"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("珙冨-国际娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富-国际娛樂"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富-菓殛娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富-帼暨娛樂"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富國際娛樂"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("珙冨国际娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富国际娛樂"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富菓殛娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共富帼暨娛樂"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富國際娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("珙-冨国际娛樂"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富国际娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富菓殛娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富帼暨娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富國_際娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("珙-冨国_际娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富国_际娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富菓_殛娱乐"), 1.0);
+        assert_eq!(super::get_gong_fu_possibility("共-富帼_暨娱乐"), 1.0);
     }
 
     #[test]
